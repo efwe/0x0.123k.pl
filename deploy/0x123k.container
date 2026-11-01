@@ -1,0 +1,23 @@
+[Unit]
+Description=0x123k.pl private file host
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=localhost/0x123k:latest
+ContainerName=0x123k
+PublishPort=127.0.0.1:5000:5000
+Volume=/home/fw/0x0/data:/data:Z
+UserNS=keep-id:uid=1000,gid=1000
+Environment=PUBLIC_HOST=0x123k.pl
+Environment=MAX_UPLOAD_BYTES=268435456
+Environment=RETENTION_DAYS=365
+NoNewPrivileges=true
+DropCapability=all
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

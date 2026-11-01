@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily expiration cleanup for 0x123k.pl
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target

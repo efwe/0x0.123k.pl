@@ -1,0 +1,8 @@
+[Unit]
+Description=Prune expired 0x123k.pl files
+Requires=0x123k.service
+After=0x123k.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/podman exec 0x123k python -m flask --app fhost prune
