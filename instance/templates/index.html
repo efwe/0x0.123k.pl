@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ config["SERVER_NAME"] }} — personal file host</title>
+    <style>body { margin: 2rem; } pre { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }</style>
+</head>
+<body>
+<pre>
+{{ config["SERVER_NAME"] }}
+PERSONAL FILE HOST
+==================
+{% set host = url_for("fhost", _external=True, _scheme="https").rstrip("/") %}
+This is a personal instance of 0x0, not a public upload service.
+Yes, uploads require a login. That's intentional: this page is public
+so the owner can use it as a README, and visitors know what to expect.
+
+Got a file link on IRC? Just open it. Downloads need no account.
+Uploading files, fetching remote URLs, and managing files require the
+owner's HTTP Basic Auth credentials. Public registration is not available.
+
+OWNER'S QUICK REFERENCE
+-----------------------
+Replace USERNAME with your login. curl will prompt for the password.
+
+Upload a local file:
+    curl -u USERNAME -F 'file=@yourfile.png' {{ host }}/
+
+Fetch a remote file and host a copy:
+    curl -u USERNAME -F 'url=https://example.com/image.jpg' {{ host }}/
+
+Add a random secret to the returned link:
+    curl -u USERNAME -F 'file=@yourfile.png' -F 'secret=' {{ host }}/
+The link is still public: anyone who has it can download the file.
+
+Expire an upload after 24 hours:
+    curl -u USERNAME -F 'file=@yourfile.png' -F 'expires=24' {{ host }}/
+The expires field also accepts a Unix timestamp in milliseconds.
+
+Download a shared file without authentication:
+    curl -O {{ host }}/abc.txt
+
+Save upload response headers to keep the management token:
+    curl -u USERNAME -D headers.txt -F 'file=@yourfile.png' {{ host }}/
+X-Token is returned for a new or expired file. Keep that token private.
+
+Delete a file (requires both your login and its management token):
+    curl -u USERNAME -F 'token=TOKEN' -F 'delete=' {{ host }}/abc.txt
+
+Change its expiration to three hours from now:
+    curl -u USERNAME -F 'token=TOKEN' -F 'expires=3' {{ host }}/abc.txt
+
+LIMITS AND RETENTION
+--------------------
+Maximum upload request size: {{ config["MAX_CONTENT_LENGTH"]|filesizeformat(True) }} (including multipart overhead).
+{% set min_days = config["FHOST_MIN_EXPIRATION"] / 86400000 %}
+{% set max_days = config["FHOST_MAX_EXPIRATION"] / 86400000 %}
+{% if min_days == max_days %}
+Default retention: {{ "%g"|format(max_days) }} days, independent of file size.
+{% else %}
+Default retention: {{ "%g"|format(min_days) }}–{{ "%g"|format(max_days) }} days, depending on file size.
+{% endif %}
+You can request a shorter lifetime. Expired files are removed by the next
+scheduled cleanup, rather than immediately at the expiration timestamp.
+Remote servers must provide Content-Length for URL fetching.
+URL shortening is disabled on this instance.
+
+Powered by <a href="https://git.0x0.st/mia/0x0">0x0 / The Null Pointer</a>.
+</pre>
+</body>
+</html>

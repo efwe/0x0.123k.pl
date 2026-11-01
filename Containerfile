@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir -r /app/requirements-minimal.txt \
     && useradd --uid 1000 --no-create-home app \
     && mkdir -p /data && chown app:app /data
 COPY config.py /app/instance/config.py
+COPY instance/templates/ /app/instance/templates/
 COPY wsgi.py entrypoint.sh /app/
 USER 1000:1000
 EXPOSE 5000

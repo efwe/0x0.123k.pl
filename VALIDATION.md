@@ -39,3 +39,13 @@ nginx and rootless application containers on 2026-11-01:
 - URL shortening remained disabled (400).
 
 No VPS changes. Temporary containers and fixture data were removed.
+
+## Public homepage
+
+Reviewed the live upstream index and added an instance-template override.
+Rebuilt the image and verified rendered GET/HEAD responses with the actual
+Flask application: personal-service notice, public-download policy,
+authenticated upload/remote-fetch/management examples, HTTPS example URLs,
+and limits/retention derived from runtime configuration. Tested alternate
+20 MiB and 42-day settings to confirm these values are not hardcoded.
+No VPS changes.
