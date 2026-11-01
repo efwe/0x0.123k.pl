@@ -7,7 +7,7 @@ from fhost import app
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
 @app.before_request
-def file_uploads_only():
+def disable_url_shortening():
     if request.method == "POST" and request.path == "/":
-        if "url" in request.form or "shorten" in request.form:
-            abort(400, "Only direct file uploads are enabled.")
+        if "shorten" in request.form:
+            abort(400, "URL shortening is disabled.")

@@ -1,9 +1,11 @@
 # 0x123k.pl
 
-Private 0x0 file hosting with host nginx providing HTTPS and one-user Basic Auth.
+0x0 file hosting with public download links and one-user Basic Auth for writes.
+Host nginx provides HTTPS and authentication.
 Gunicorn runs the upstream Flask application in a rootless Podman container.
-All URLs, including downloads and management requests, require authentication.
-No scanners, models, moderation UI, URL fetching, or new shortened URLs.
+GET and HEAD requests are public, so download links can be shared on IRC.
+Uploads, remote URL fetching, and management POSTs require authentication.
+No scanners, models, moderation UI, or new shortened URLs.
 
 ## Build
 
@@ -59,20 +61,26 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-Basic Auth covers the entire server. Review any existing locations that might
-bypass the proxy or override authentication. No credentials are in the image.
+Basic Auth protects methods other than GET and HEAD in the proxy location.
+Review any existing locations that might bypass this policy. No credentials are in the image.
 To change the password later, run htpasswd again without `-c`.
 
 ## Use and configuration
 
 ```sh
 curl -u fw -F file=@example.txt https://0x123k.pl/
-curl -u fw https://0x123k.pl/RETURNED_NAME.txt
+curl https://0x123k.pl/RETURNED_NAME.txt
+# Optional: have 0x0 download a remote file and return a hosted link.
+curl -u fw -F url=https://example.com/file.txt https://0x123k.pl/
 ```
 
 Curl prompts for the password. Save response headers with `-D headers.txt` when
 you need upstream's `X-Token` for deletion or expiration management.
 Management POST requests require both Basic Auth and the upstream token.
+Share the returned URL as-is; recipients need no credentials. Optional
+`-F secret=` adds an unguessable component to the public download URL.
+Remote fetching uses upstream behavior: the remote server must provide a
+Content-Length header, and the configured size limit applies.
 
 Configuration is baked into the image; no config directory mount is needed.
 Edit the Quadlet environment settings to change hostname, request size, or
@@ -101,7 +109,7 @@ in Containerfile, review dependency changes, rebuild, and restart. Startup runs
 upstream database migrations. A rollback after a schema change may require
 restoring the matching data backup, not just reverting the image.
 
-Verify anonymous access returns 401, authenticated upload/download works,
+Verify anonymous POST returns 401, authenticated upload and public download work,
 management tokens work, and uploads survive container recreation. Check HTTPS
 URLs in upload responses, size limits, and range requests before relying on
 media seeking. Deployment does not automatically modify the VPS.
