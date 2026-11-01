@@ -23,9 +23,13 @@ Debian package updates are resolved at build time.
 
 ## VPS installation
 
-Check `/etc/os-release` first: 26.04 is Ubuntu version numbering, not Debian.
-Install Podman with Quadlet support (Podman 4.4+), nginx, and apache2-utils using
-the host distribution packages. Run the following as `fw`:
+Build locally and only transport the image
+
+```
+podman save -o 0x123k.tar localhost/0x123k:latest
+scp ...
+podman load -i 0x123k.tar
+```
 
 ```sh
 mkdir -p /home/fw/0x0/data ~/.config/containers/systemd ~/.config/systemd/user
@@ -47,13 +51,14 @@ that port directly; nginx is the authentication boundary.
 Create the one nginx account (password is prompted, not placed in history):
 
 ```sh
-sudo htpasswd -cB /etc/nginx/0x123k.htpasswd fw
-sudo chown root:www-data /etc/nginx/0x123k.htpasswd
-sudo chmod 640 /etc/nginx/0x123k.htpasswd
+openssl passwd -6
+put output into  /etc/nginx/0x0.123k.pl.htpasswd 
+sudo chown root:www-data /etc/nginx/0x0.123k.pl.htpasswd
+sudo chmod 640 /etc/nginx/0x0.123k.pl.htpasswd
 ```
 
 Include the contents of `deploy/nginx.conf` inside the existing HTTPS server
-block for `0x123k.pl`. Keep the host's certificate configuration and HTTP redirect.
+block for `0x0.123k.pl`. Keep the host's certificate configuration and HTTP redirect.
 Adjust the nginx group above if your distribution uses a different worker group.
 
 ```sh
