@@ -1,6 +1,6 @@
-# 0x123k.pl
+# 0x0.123k.pl
 
-0x0 file hosting with public download links and one-user Basic Auth for writes.
+https://0x0.123k.pl file hosting with public download links and one-user Basic Auth for writes.
 Host nginx provides HTTPS and authentication.
 Gunicorn runs the upstream Flask application in a rootless Podman container.
 GET and HEAD requests are public, so download links can be shared on IRC.
